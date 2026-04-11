@@ -95,7 +95,13 @@ npm run preview
 
 ## 🔧 配置 GitHub 部署
 
-### 步骤 1：推送到 GitHub
+> 📖 **详细配置指南请见** [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md) 
+
+如果部署失败，请首先查看那个文件中的故障排查部分。
+
+### 快速步骤
+
+#### 步骤 1：推送到 GitHub
 
 ```bash
 git init
@@ -106,20 +112,70 @@ git remote add origin https://github.com/你的用户名/interview-card-cms.git
 git push -u origin main
 ```
 
-### 步骤 2：启用 GitHub Pages
+#### 步骤 2：配置 GitHub Pages（重要！）
 
-在 GitHub 仓库设置中：
-1. 进入 **Settings** → **Pages**
-2. 在 **Source** 下选择 **GitHub Actions**
-3. 系统已自动识别工作流，无需额外配置
+> ⚠️ 这一步很重要，需要在 GitHub 仓库设置中手动配置
 
-### 步骤 3：自动部署
+**详细步骤：**
+
+1. **进入仓库设置**
+   - 打开你的 GitHub 仓库页面
+   - 点击顶部菜单中的 **Settings**（设置）
+   - 在左侧菜单中找到 **Pages**（页面）
+
+2. **配置 GitHub Pages Source**
+   - 在 **Source** 部分，选择 **Deploy from a branch**（从分支部署）
+   - **Branch** 下拉菜单选择：`gh-pages` / `/(root)`
+   - 点击 **Save**（保存）
+
+3. **验证部署**
+   - 返回 **Actions** 标签
+   - 查看是否有绿色的 ✅ **Deploy Interview CMS** 流程
+   - 如果显示红色 ❌，点击查看错误日志
+
+4. **访问你的网站**
+   ```
+   https://你的用户名.github.io/interview-card-cms
+   ```
+
+**常见问题排查：**
+
+| 问题 | 解决方案 |
+|------|--------|
+| Actions 中仍显示 ❌ | 检查是否已保存 GitHub Pages 设置 |
+| 网站显示 404 | 等待 1-2 分钟，刷新浏览器，或检查仓库名称是否正确 |
+| 样式加载失败 | 清除浏览器缓存（Cmd+Shift+Delete） |
+| 面经卡片为空 | 检查 `interviews/` 文件夹中是否有 .md 文件 |
+
+### 步骤 3：自动部署工作流
 
 - 每当你推送到 `main` 分支时，工作流会自动：
-  1. 安装依赖
-  2. 构建项目
-  3. 部署到 GitHub Pages
-- 访问 `https://你的用户名.github.io/interview-card-cms`
+  1. ✅ 检出代码
+  2. ✅ 安装依赖（使用 package-lock.json）
+  3. ✅ 构建项目（生成 dist 文件夹）
+  4. ✅ 上传到 GitHub Pages
+  5. ✅ 自动部署到网站
+
+- 查看部署状态：**Actions** → 最新的工作流 → 查看日志
+
+### 步骤 4：持续更新
+
+每次你需要添加或修改面经：
+
+```bash
+# 1. 创建或编辑面经文件
+# 编辑 interviews/ 中的 .md 文件
+
+# 2. 本地测试（可选）
+npm run dev
+
+# 3. 提交并推送
+git add .
+git commit -m "Add/Update interviews"
+git push origin main
+
+# GitHub Actions 会自动构建和部署！
+```
 
 ## 📝 Markdown 示例
 
@@ -225,14 +281,66 @@ GitHub Actions 工作流 (`.github/workflows/deploy.yml`) 做以下事情：
 
 ## 🐛 常见问题
 
+### 本地开发问题
+
 **Q: 如何更新已部署的内容？**
 A: 只需编辑 `interviews/` 中的 Markdown 文件，然后推送到 GitHub，工作流会自动重新构建和部署。
 
 **Q: 如何添加新的难度等级？**
 A: 编辑 `index.html`，在 CSS 中添加新的 `.difficulty` 类，并在 Markdown front matter 中使用。
 
+**Q: 本地 npm run dev 报错？**
+A: 
+```bash
+# 清除缓存并重新安装
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps
+npm run dev
+```
+
+### GitHub Pages 部署问题
+
+**Q: GitHub Actions 中仍然显示红色 ❌？**
+A: 这通常是因为未配置 GitHub Pages 设置。请按以下步骤操作：
+1. 进入仓库 **Settings** → **Pages**
+2. 在 **Source** 部分选择 **Deploy from a branch**
+3. Branch 选择 **gh-pages** / **root**
+4. 点击 **Save** 保存
+5. 返回 **Actions** 重新运行工作流
+
+**Q: 网站显示 404？**
+A: 
+- 等待 1-2 分钟后刷新浏览器
+- 检查 URL 是否正确：`https://用户名.github.io/仓库名`
+- 检查浏览器缓存：Cmd+Shift+Delete（Mac）或 Ctrl+Shift+Delete（Windows）
+
+**Q: 卡片为空或样式加载失败？**
+A:
+- 确保 `interviews/` 文件夹有 .md 文件
+- 本地运行 `npm run build` 生成数据文件
+- 清除浏览器缓存重新加载
+- 检查浏览器开发者工具（F12）的网络标签是否有 404 错误
+
+**Q: 什么是 package-lock.json 为什么要提交它？**
+A: `package-lock.json` 确保 GitHub Actions 中安装的依赖版本与本地完全相同，避免部署时版本不一致导致的问题。
+
+**Q: 部署后多久能看到更新？**
+A: GitHub Actions 通常在 1-3 分钟内完成部署。如果超过 5 分钟仍未更新，检查 Actions 日志查看错误。
+
+### 内容管理问题
+
 **Q: 如果网站部署后没有更新？**
-A: 检查 GitHub Actions 的工作流执行状态。清除浏览器缓存或在 GitHub Pages 设置中手动触发重新部署。
+A: 检查 GitHub Actions 的工作流执行状态。清除浏览器缓存或等待重新部署。
+
+**Q: 能否自定义网站样式？**
+A: 完全可以！编辑 `index.html` 中的 `<style>` 标签即可修改：
+- 背景颜色和梯度
+- 卡片样式
+- 文字颜色
+- 阴影效果
+- 等等
+
+更多信息见 `CUSTOMIZATION.md` 文件。
 
 ## 📄 License
 
