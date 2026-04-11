@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
+# NOTE: 保留 package-lock.json 用于 CI/CD
 
 # Production build
 dist/
