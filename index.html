@@ -376,7 +376,11 @@
     // 加载面经数据
     async function loadInterviews() {
       try {
-        const response = await fetch('./interviews.json');
+        // 构建正确的数据文件路径
+        const basePath = window.location.pathname.includes('/Interview-Card-CMS/') 
+          ? '/Interview-Card-CMS/interviews.json'
+          : '/interviews.json';
+        const response = await fetch(basePath);
         if (!response.ok) throw new Error('Failed to load interviews');
         interviews = await response.json();
         renderCards();
