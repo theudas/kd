@@ -40,17 +40,18 @@ git push origin main
 
 3. **配置 Pages Source**
    
-   **方案 A：使用 GitHub Actions（推荐）** ⭐
+   **方案 A：使用 GitHub Actions（推荐）** ⭐ **【推荐使用这个】**
    - 在 **Build and deployment** 部分
    - **Source** 选择 **GitHub Actions**
    - 页面会自动识别项目中的 `.github/workflows/deploy.yml`
+   - **不需要手动创建 gh-pages 分支**
    - 无需其他配置
 
-   **方案 B：使用 gh-pages 分支**
+   **方案 B：使用 gh-pages 分支**（备选，当 Actions 无法使用时）
    - **Source** 选择 **Deploy from a branch**
-   - **Branch** 选择 **gh-pages**
-   - **/(root)** 保持不变
+   - **Branch** 选择 **gh-pages** 和 **/(root)**
    - 点击 **Save**
+   - 注意：需要工作流自动创建 gh-pages 分支，或手动创建
 
 4. **保存设置**
    - 点击 **Save**（如果有该按钮）
@@ -197,6 +198,29 @@ git push origin main
    - 确保 `interviews/` 有 .md 文件
    - 确保 `package.json` 存在
    - 确保 `.github/workflows/deploy.yml` 存在
+
+---
+
+## ❓ gh-pages 分支相关问题
+
+**Q: 下拉菜单中只有 main 分支，需要手动创建 gh-pages 吗？**
+
+A: **不需要！** 
+
+当你选择 **GitHub Actions** 作为 Source 时：
+- GitHub Actions 会自动管理 gh-pages 分支
+- 工作流执行完毕后，系统会自动创建和更新 gh-pages 分支
+- 你无需手动操作
+
+如果你选择 **Deploy from a branch** 方案：
+- 下拉菜单会自动刷新并显示 **gh-pages**（在工作流运行后）
+- 第一次运行工作流时会自动创建这个分支
+
+**步骤：**
+1. 选择 **GitHub Actions** 作为 Source（推荐）
+2. 保存设置
+3. 等待 1-2 分钟让工作流运行
+4. 刷新页面，gh-pages 分支会自动出现
 
 ---
 

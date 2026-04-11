@@ -124,8 +124,10 @@ git push -u origin main
    - 在左侧菜单中找到 **Pages**（页面）
 
 2. **配置 GitHub Pages Source**
-   - 在 **Source** 部分，选择 **Deploy from a branch**（从分支部署）
-   - **Branch** 下拉菜单选择：`gh-pages` / `/(root)`
+   - 在 **Build and deployment** → **Source** 部分
+   - 选择 **GitHub Actions**（推荐，会自动使用你的工作流）
+   - 系统会自动识别 `.github/workflows/deploy.yml`
+   - **不需要手动创建 gh-pages 分支**
    - 点击 **Save**（保存）
 
 3. **验证部署**
