@@ -135,7 +135,7 @@ Rank 是 LoRA 中的重要超参数。
 
 ## GitHub Pages 部署说明
 
-项目已经自带 GitHub Actions 工作流文件 [deploy.yml](/Users/tanruoying/Desktop/my-interview/.github/workflows/deploy.yml)，推送到 `main` 分支后即可自动构建和部署。
+项目已经自带 GitHub Actions 工作流文件 [deploy.yml](/Users/tanruoying/Downloads/my-interview/.github/workflows/deploy.yml)，推送到 `main` 分支后即可自动构建和部署。
 
 ### 1. 推送到 GitHub
 
@@ -146,7 +146,7 @@ git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin https://github.com/你的用户名/你的仓库名.git
+git remote add origin https://github.com/theudas/kd.git
 git push -u origin main
 ```
 
@@ -174,7 +174,7 @@ git push origin main
 
 ### 3. 等待 Actions 完成部署
 
-推送代码后，打开仓库的 `Actions` 页面，查看 `Deploy Interview CMS` 工作流。
+推送代码后，打开仓库的 `Actions` 页面，查看 `Deploy Knowledge Base` 工作流。
 
 它会自动执行：
 
@@ -189,7 +189,7 @@ git push origin main
 部署成功后，普通项目仓库的地址通常是：
 
 ```text
-https://你的用户名.github.io/你的仓库名/
+https://theudas.github.io/kd/
 ```
 
 ## 部署前建议检查
