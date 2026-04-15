@@ -11,7 +11,9 @@
     "create": "node scripts/create.js"
   },
   "dependencies": {
+    "katex": "^0.16.45",
     "marked": "^11.1.0",
+    "marked-katex-extension": "^5.1.8",
     "terser": "^5.46.1"
   },
   "devDependencies": {

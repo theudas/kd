@@ -1,5 +1,7 @@
 import './styles.css'
+import 'katex/dist/katex.min.css'
 import { marked } from 'marked'
+import markedKatex from 'marked-katex-extension'
 
 const app = document.querySelector('#app')
 
@@ -7,6 +9,11 @@ marked.setOptions({
   gfm: true,
   breaks: true
 })
+
+marked.use(markedKatex({
+  throwOnError: false,
+  nonStandard: true
+}))
 
 const state = {
   data: null,
@@ -19,7 +26,7 @@ function getDataUrl() {
 }
 
 function stripMarkdown(markdown = '') {
-  return markdown
+  return normalizeMathMarkdown(markdown)
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
@@ -27,8 +34,15 @@ function stripMarkdown(markdown = '') {
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/[*_~>-]/g, ' ')
     .replace(/\$\$[\s\S]*?\$\$/g, ' ')
+    .replace(/\$([^$\n]+)\$/g, '$1')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+function normalizeMathMarkdown(markdown = '') {
+  return markdown
+    .replace(/\\\[\s*([\s\S]*?)\s*\\\]/g, (_, formula) => `\n\n$$\n${formula.trim()}\n$$\n\n`)
+    .replace(/\\\(\s*([\s\S]*?)\s*\\\)/g, (_, formula) => `$${formula.trim()}$`)
 }
 
 function getExcerpt(markdown, maxLength = 92) {
@@ -124,7 +138,7 @@ function renderHome() {
   return `
     <section class="panel">
       <div class="section-head">
-        <h1>知识库首页</h1>
+        <h1>知识库</h1>
       </div>
 
       <div class="cards-grid categories-grid">
@@ -196,7 +210,7 @@ function renderCategory(category) {
 }
 
 function renderItem(category, item) {
-  const itemHtml = marked.parse(item.content || '')
+  const itemHtml = marked.parse(normalizeMathMarkdown(item.content || ''))
   const breadcrumbs = renderBreadcrumbs([
     { label: '知识库', href: '#/' },
     { label: category.title, href: `#/category/${encodeURIComponent(category.id)}` },

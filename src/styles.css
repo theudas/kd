@@ -356,6 +356,21 @@ button {
   background: rgba(37, 99, 235, 0.06);
 }
 
+.markdown-shell .katex {
+  font-size: 1.05em;
+}
+
+.markdown-shell .katex-display {
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
+}
+
+.markdown-shell .katex-display > .katex {
+  min-width: max-content;
+}
+
 .article-shell {
   padding: 30px;
 }
