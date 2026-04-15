@@ -1,31 +1,32 @@
-# 面试知识卡片站点
+# 知识库站点
 
-这是一个基于 Markdown 的静态知识库项目，用来把不同技术方向整理成网站卡片并部署到 GitHub Pages。
+这是一个基于 Markdown 的静态知识库项目，用来把不同主题整理成可浏览的知识页并部署到 GitHub Pages。
 
 当前站点是两层结构：
 
-- 首页展示技术方向卡片
-- 方向页展示该方向下的知识点卡片
+- 首页展示知识分类
+- 分类页展示该分类下的知识点
 - 知识点页展示具体正文内容
 
-你后续只需要维护 `interviews/categories/` 和 `interviews/knowledge/` 里的 Markdown 文件，重新构建后网站内容就会自动更新。
+你后续只需要维护 `knowledge/categories/` 和 `knowledge/items/` 里的 Markdown 文件，重新构建后网站内容就会自动更新。
 
 ## 项目结构
 
 ```text
 ./
 ├── .github/workflows/deploy.yml
-├── interviews/
+├── knowledge/
 │   ├── categories/
 │   │   ├── dpo.md
 │   │   ├── grpo.md
 │   │   └── lora.md
-│   └── knowledge/
-│       ├── dpo/
-│       ├── grpo/
-│       └── lora/
+│   ├── items/
+│   │   ├── dpo/
+│   │   ├── grpo/
+│   │   └── lora/
+│   └── interviews/
 ├── public/
-│   └── interviews.json
+│   └── knowledge.json
 ├── scripts/
 │   ├── build.js
 │   └── create.js
@@ -74,9 +75,9 @@ npm run build
 
 构建流程：
 
-1. 读取 `interviews/categories/` 中的方向 Markdown
-2. 读取 `interviews/knowledge/` 中的知识点 Markdown
-3. 生成 `public/interviews.json`
+1. 读取 `knowledge/categories/` 中的分类 Markdown
+2. 读取 `knowledge/items/` 中的知识点 Markdown
+3. 生成 `public/knowledge.json`
 4. 使用 Vite 构建前端
 5. 输出静态文件到 `dist/`
 
@@ -88,35 +89,27 @@ npm run preview
 
 ## 如何维护内容
 
-### 新增技术方向
+### 新增知识分类
 
-在 `interviews/categories/` 下新增一个 Markdown 文件，例如 `lora.md`：
+在 `knowledge/categories/` 下新增一个 Markdown 文件，例如 `lora.md`：
 
 ```markdown
 ---
 id: lora
 title: LoRA
-description: 低秩自适应方法，一种高效的微调技术
-icon: 🔧
 color: "#3498db"
 ---
-
-# LoRA 技术概述
-
-LoRA（Low-Rank Adaptation）是一种参数高效的微调方法。
 ```
 
 字段说明：
 
-- `id`：方向唯一标识，必须和知识点目录名一致
-- `title`：方向名称
-- `description`：方向简介
-- `icon`：方向卡片图标
-- `color`：方向卡片强调色
+- `id`：分类唯一标识，必须和知识点目录名一致
+- `title`：分类名称
+- `color`：分类强调色
 
 ### 新增知识点
 
-在对应方向目录下新增 Markdown 文件，例如 `interviews/knowledge/lora/rank.md`：
+在对应分类目录下新增 Markdown 文件，例如 `knowledge/items/lora/rank.md`：
 
 ```markdown
 ---
@@ -135,7 +128,7 @@ Rank 是 LoRA 中的重要超参数。
 字段说明：
 
 - `title`：知识点标题
-- `category`：所属方向
+- `category`：所属分类
 - `order`：排序值，数字越小越靠前
 - `difficulty`：难度，建议使用 `Easy`、`Medium`、`Hard`
 - `tags`：标签数组
@@ -204,8 +197,8 @@ https://你的用户名.github.io/你的仓库名/
 - 本地 `npm run build` 可以成功执行
 - `package-lock.json` 已提交
 - `.github/workflows/deploy.yml` 存在
-- `interviews/categories/` 中至少有一个方向文件
-- `interviews/knowledge/` 中至少有对应知识点文件
+- `knowledge/categories/` 中至少有一个分类文件
+- `knowledge/items/` 中至少有对应知识点文件
 
 ## 常见问题
 
@@ -222,15 +215,15 @@ https://你的用户名.github.io/你的仓库名/
 检查：
 
 - 构建是否成功
-- `public/interviews.json` 是否已生成
+- `public/knowledge.json` 是否已生成
 - 浏览器控制台是否有资源加载错误
 
 ### 卡片没有内容
 
 检查：
 
-- `interviews/categories/<id>.md` 是否存在
-- `interviews/knowledge/<id>/` 是否存在对应知识点文件
+- `knowledge/categories/<id>.md` 是否存在
+- `knowledge/items/<id>/` 是否存在对应知识点文件
 - Markdown 文件中的 Front Matter 字段是否正确
 
 ## 更新内容后的标准流程

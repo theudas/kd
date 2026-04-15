@@ -53,19 +53,6 @@ button {
   overflow: hidden;
 }
 
-.topbar {
-  width: min(calc(100% - 32px), var(--content-width));
-  margin: 0 auto;
-  padding: 24px 0 12px;
-}
-
-.brand {
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  font-size: 1.05rem;
-  color: var(--accent-strong);
-}
-
 .page-shell {
   width: min(calc(100% - 32px), var(--content-width));
   margin: 0 auto;
@@ -453,8 +440,7 @@ button {
 }
 
 @media (max-width: 560px) {
-  .page-shell,
-  .topbar {
+  .page-shell {
     width: min(calc(100% - 20px), var(--content-width));
   }
 

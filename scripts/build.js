@@ -49,8 +49,8 @@ function readMarkdownFilesRecursive(dir, baseDir = '') {
 // 主程序
 async function build() {
   try {
-    const categoriesDir = path.join(projectRoot, 'interviews', 'categories')
-    const knowledgeDir = path.join(projectRoot, 'interviews', 'knowledge')
+    const categoriesDir = path.join(projectRoot, 'knowledge', 'categories')
+    const itemsDir = path.join(projectRoot, 'knowledge', 'items')
     const publicDir = path.join(projectRoot, 'public')
 
     // 确保 public 目录存在
@@ -66,17 +66,14 @@ async function build() {
       const categoryId = category.id || category.filename.replace('.md', '')
       
       // 读取该分类下的所有知识点
-      const categoryKnowledgeDir = path.join(knowledgeDir, categoryId)
+      const categoryKnowledgeDir = path.join(itemsDir, categoryId)
       const knowledgeFiles = readMarkdownFilesRecursive(categoryKnowledgeDir)
         .sort((a, b) => (a.order || 999) - (b.order || 999))
       
       return {
         id: categoryId,
         title: category.title || categoryId,
-        description: category.description || '',
-        icon: category.icon || '📚',
         color: category.color || '#3498db',
-        content: category.content || '',
         items: knowledgeFiles.map((item, index) => ({
           id: item.filename.replace('.md', ''),
           title: item.title || item.filename,
@@ -96,16 +93,16 @@ async function build() {
       categories
     }
 
-    const outputPath = path.join(publicDir, 'interviews.json')
+    const outputPath = path.join(publicDir, 'knowledge.json')
     fs.writeFileSync(outputPath, JSON.stringify(output, null, 2))
 
     // 统计信息
     const totalCategories = categories.length
     const totalItems = categories.reduce((sum, cat) => sum + cat.items.length, 0)
-    console.log(`✅ Generated ${totalCategories} categories and ${totalItems} knowledge items to ${outputPath}`)
+    console.log(`Generated ${totalCategories} categories and ${totalItems} knowledge items to ${outputPath}`)
 
   } catch (error) {
-    console.error('❌ Build failed:', error)
+    console.error('Build failed:', error)
     process.exit(1)
   }
 }

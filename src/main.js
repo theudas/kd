@@ -15,7 +15,7 @@ const state = {
 }
 
 function getDataUrl() {
-  return `${import.meta.env.BASE_URL}interviews.json`
+  return `${import.meta.env.BASE_URL}knowledge.json`
 }
 
 function stripMarkdown(markdown = '') {
@@ -124,7 +124,7 @@ function renderHome() {
   return `
     <section class="panel">
       <div class="section-head">
-        <h1>技术方向</h1>
+        <h1>知识库首页</h1>
       </div>
 
       <div class="cards-grid categories-grid">
@@ -137,9 +137,8 @@ function renderHome() {
                   <span class="count-pill">${category.items.length} 个知识点</span>
                 </div>
                 <h3>${escapeHtml(category.title)}</h3>
-                <p>${escapeHtml(category.description || '等待补充该方向的简介。')}</p>
                 <div class="card-footer">
-                  <span>查看知识卡片</span>
+                  <span>查看知识点</span>
                   <span class="arrow">→</span>
                 </div>
               </article>
@@ -152,9 +151,8 @@ function renderHome() {
 }
 
 function renderCategory(category) {
-  const introHtml = marked.parse(category.content || '')
   const breadcrumbs = renderBreadcrumbs([
-    { label: '首页', href: '#/' },
+    { label: '知识库', href: '#/' },
     { label: category.title }
   ])
 
@@ -164,21 +162,13 @@ function renderCategory(category) {
     <section class="detail-hero panel" style="--detail-accent: ${escapeHtml(category.color || '#1f6feb')}">
       <div class="detail-title-row">
         <div class="detail-title-main">
-          <div>
-            <h1>${escapeHtml(category.title)}</h1>
-            ${category.description ? `<p>${escapeHtml(category.description)}</p>` : ''}
-          </div>
+          <h1>${escapeHtml(category.title)}</h1>
         </div>
-        <a class="ghost-button" href="#/">返回方向首页</a>
+        <a class="ghost-button" href="#/">返回首页</a>
       </div>
-      <div class="markdown-shell">${introHtml}</div>
     </section>
 
     <section class="panel">
-      <div class="section-head">
-        <h2>${escapeHtml(category.title)} 知识点</h2>
-      </div>
-
       <div class="cards-grid knowledge-grid">
         ${category.items
           .map(item => {
@@ -208,7 +198,7 @@ function renderCategory(category) {
 function renderItem(category, item) {
   const itemHtml = marked.parse(item.content || '')
   const breadcrumbs = renderBreadcrumbs([
-    { label: '首页', href: '#/' },
+    { label: '知识库', href: '#/' },
     { label: category.title, href: `#/category/${encodeURIComponent(category.id)}` },
     { label: item.title }
   ])
@@ -225,7 +215,7 @@ function renderItem(category, item) {
         </div>
         <div class="article-actions">
           <a class="ghost-button" href="#/category/${encodeURIComponent(category.id)}">返回 ${escapeHtml(category.title)}</a>
-          <a class="solid-button" href="#/">回到首页</a>
+          <a class="solid-button" href="#/">回到知识库</a>
         </div>
       </div>
 
@@ -242,7 +232,7 @@ function renderItem(category, item) {
         ? `
           <section class="panel">
             <div class="section-head">
-              <h2>同方向其他卡片</h2>
+              <h2>同类其他知识点</h2>
             </div>
             <div class="cards-grid knowledge-grid">
               ${related
@@ -288,7 +278,7 @@ function renderError() {
   return `
     <section class="panel empty-state">
       <h1>内容加载失败</h1>
-      <p>${escapeHtml(state.error || '无法读取 interviews.json')}</p>
+      <p>${escapeHtml(state.error || '无法读取 knowledge.json')}</p>
       <button class="solid-button" type="button" data-action="reload">重新加载</button>
     </section>
   `
@@ -306,20 +296,17 @@ function renderApp() {
     content = renderHome()
   } else if (route.name === 'category') {
     const category = findCategory(route.categoryId)
-    content = category ? renderCategory(category) : renderNotFound('这个技术方向还没有生成页面。')
+    content = category ? renderCategory(category) : renderNotFound('这个知识分类还没有生成页面。')
   } else if (route.name === 'item') {
     const category = findCategory(route.categoryId)
     const item = findItem(category, route.itemId)
-    content = category && item ? renderItem(category, item) : renderNotFound('这个知识卡片暂时不存在。')
+    content = category && item ? renderItem(category, item) : renderNotFound('这个知识点暂时不存在。')
   } else {
     content = renderNotFound()
   }
 
   app.innerHTML = `
     <div class="site-shell">
-      <header class="topbar">
-        <a class="brand" href="#/">知识卡片</a>
-      </header>
       <main class="page-shell">${content}</main>
     </div>
   `

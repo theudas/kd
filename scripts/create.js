@@ -28,7 +28,7 @@ const required = ['title', 'company', 'position'];
 const missing = required.filter(key => !params[key]);
 
 if (missing.length > 0) {
-  console.error('❌ 缺少必需参数:', missing.join(', '));
+  console.error('缺少必需参数:', missing.join(', '));
   console.error('\n使用方法:');
   console.error('npm run create -- \\');
   console.error('  --title "面经标题" \\');
@@ -47,11 +47,11 @@ const filename = params.title
   .replace(/[^a-z0-9-]/g, '')
   .substring(0, 50);
 
-const filepath = path.join(__dirname, 'interviews', `${filename}.md`);
+const filepath = path.join(__dirname, 'knowledge', 'interviews', `${filename}.md`);
 
 // 检查文件是否存在
 if (fs.existsSync(filepath)) {
-  console.error(`❌ 文件已存在: ${filepath}`);
+  console.error(`文件已存在: ${filepath}`);
   process.exit(1);
 }
 
@@ -95,8 +95,8 @@ summary: "在这里添加摘要"
 - [资源链接](https://example.com)
 `;
 
-// 创建 interviews 目录（如果不存在）
-const interviewsDir = path.join(__dirname, 'interviews');
+// 创建 knowledge/interviews 目录（如果不存在）
+const interviewsDir = path.join(__dirname, 'knowledge', 'interviews');
 if (!fs.existsSync(interviewsDir)) {
   fs.mkdirSync(interviewsDir, { recursive: true });
 }
@@ -104,9 +104,9 @@ if (!fs.existsSync(interviewsDir)) {
 // 写入文件
 fs.writeFileSync(filepath, frontmatter, 'utf-8');
 
-console.log('✅ 面经文件已创建!');
-console.log(`📄 路径: ${filepath}`);
-console.log(`\n📝 编辑提示:`);
+console.log('面经文件已创建');
+console.log(`路径: ${filepath}`);
+console.log('\n编辑提示:');
 console.log(`  1. 打开文件: ${filepath}`);
 console.log(`  2. 编写你的面经内容`);
 console.log(`  3. 运行 'npm run dev' 本地预览`);

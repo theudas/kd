@@ -11,14 +11,10 @@
     "create": "node scripts/create.js"
   },
   "dependencies": {
-    "front-matter": "^4.0.2",
     "marked": "^11.1.0",
-    "terser": "^5.46.1",
-    "vue": "^3.4.0",
-    "vue-router": "^4.2.0"
+    "terser": "^5.46.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.0",
     "gray-matter": "^4.0.3",
     "vite": "^5.1.0"
   }

@@ -1,39 +1,36 @@
 {
   "version": "2.0",
   "type": "hierarchical",
-  "generatedAt": "2026-04-12T01:41:41.404Z",
+  "generatedAt": "2026-04-15T12:36:59.892Z",
   "categories": [
     {
       "id": "dpo",
       "title": "DPO",
-      "description": "直接偏好优化，一种奖励模型学习方法",
-      "icon": "📊",
       "color": "#e74c3c",
-      "content": "\n# DPO 技术概述\n\nDPO（Direct Preference Optimization）直接从偏好数据中学习。\n",
       "items": [
         {
           "id": "intro",
-          "title": "DPO 基础介绍",
+          "title": "DPO 偏好学习机制",
           "difficulty": "Easy",
           "tags": [
             "DPO",
-            "偏好",
-            "基础"
+            "偏好学习",
+            "策略优化"
           ],
-          "content": "\n# DPO 是什么？\n\nDPO（Direct Preference Optimization）直接从人类偏好数据中优化。\n\n## 核心思想\n\n不需要训练奖励模型，而是直接使用偏好对（preferred, dispreferred）。\n\n## 优势\n\n- 简化流程\n- 训练更稳定\n- 参数高效\n\n## 对比 RLHF\n\n传统 RLHF 需要：\n1. 训练奖励模型\n2. 使用 RL 优化策略\n\nDPO 直接优化策略。\n",
+          "content": "\n# DPO 如何直接利用偏好数据？\n\nDPO 将同一提示下的优选回答与劣选回答组成偏好对，直接优化模型对优选回答的相对概率。\n\n## 训练对象\n\n- 输入：prompt + chosen / rejected\n- 目标：提高 chosen 的条件概率，压低 rejected 的条件概率\n\n## 关键特点\n\n- 不单独训练奖励模型\n- 不引入 PPO 强化学习阶段\n- 用监督式训练流程完成偏好对齐\n\n## 适用前提\n\n- 偏好数据质量稳定\n- 参考模型与温度系数设置合理\n",
           "order": 1
         },
         {
           "id": "vsrlhf",
-          "title": "DPO vs RLHF",
+          "title": "DPO 与 RLHF 的核心差异",
           "difficulty": "Hard",
           "tags": [
             "DPO",
             "RLHF",
-            "对比",
-            "算法"
+            "流程",
+            "取舍"
           ],
-          "content": "\n# DPO 与 RLHF 的对比\n\n## 架构对比\n\n### RLHF\n- 第1步：收集偏好数据\n- 第2步：训练奖励模型\n- 第3步：使用 PPO 训练策略\n\n### DPO\n- 第1步：收集偏好数据  \n- 第2步：直接训练策略\n\n## 数学原理\n\nDPO 通过以下损失函数直接优化：\n\n$$\\mathcal{L}_{DPO} = -\\log\\sigma(\\beta \\log \\frac{\\pi_\\theta(y_w|x)}{\\pi_\\theta(y_l|x)})$$\n\n## 优缺点\n\n### DPO 优点\n- 训练更快\n- 参数更少\n- 更稳定\n\n### DPO 缺点\n- 可能过度优化\n- 需要良好的偏好数据\n",
+          "content": "\n# DPO 与 RLHF 的核心差异\n\n## 训练链路\n\n- RLHF：偏好数据 -> 奖励模型 -> PPO 更新策略\n- DPO：偏好数据 -> 直接更新策略模型\n\n## 工程取舍\n\n- DPO 链路更短，训练更稳，适合快速完成偏好对齐\n- RLHF 控制能力更强，但训练组件更多、调参成本更高\n\n## 什么时候优先选 DPO\n\n- 训练数据已经是成对偏好样本\n- 希望减少奖励模型和强化学习依赖\n- 更关注实现效率与训练稳定性\n",
           "order": 2
         }
       ]
@@ -41,10 +38,7 @@
     {
       "id": "grpo",
       "title": "GRPO",
-      "description": "群体относитель的策略优化",
-      "icon": "🎯",
       "color": "#2ecc71",
-      "content": "\n# GRPO 技术概述\n\nGRPO（Group Relative Policy Optimization）是一种基于群体相对优化的方法。\n",
       "items": [
         {
           "id": "intro",
@@ -63,10 +57,7 @@
     {
       "id": "lora",
       "title": "LoRA",
-      "description": "低秩自适应方法，一种高效的微调技术",
-      "icon": "🔧",
       "color": "#3498db",
-      "content": "\n# LoRA 技术概述\n\nLoRA（Low-Rank Adaptation）是一种参数高效的微调方法。\n",
       "items": [
         {
           "id": "intro",
