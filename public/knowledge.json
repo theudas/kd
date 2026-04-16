@@ -1,20 +1,49 @@
 {
   "version": "2.0",
   "type": "hierarchical",
-  "generatedAt": "2026-04-15T15:51:41.626Z",
+  "generatedAt": "2026-04-16T01:16:06.416Z",
   "categories": [
+    {
+      "id": "code_trick",
+      "title": "code_trick",
+      "color": "#45db34",
+      "items": [
+        {
+          "id": "001.broadcast",
+          "title": "broadcast",
+          "difficulty": "Easy",
+          "tags": [
+            "broadcast"
+          ],
+          "content": "\n## 所有能广播的情况\n\n1. 形状完全一样 → 肯定能广播\n\n比如：(2,3) 和 (2,3), (5,4,3) 和 (5,4,3)\n\n**一模一样，直接算。**\n\n\n2. 某一维是 1，另一维不是 1 → 能广播\n比如：(1,3) 和 (2,3), (2,1) 和 (2,3), (1,1,8) 和 (2,3,8)\n\n**只要是 1，就能扩成对方的大小。**\n\n3. 维度数量不一样，但后面能对上 → 能广播\n少的维度**自动往前补 1**，再继续比。\n\n比如：(8,) 和 (2,3,8), (3,) 和 (5,4,3), (1,) 和 (10,20)\n\n**后面对上就行，前面缺多少都补 1。**\n\n\n4. 标量（0维）和任何张量 → 都能广播\n标量相当于 shape=()，会自动补成：(1,1,1,...)，再扩成一样大。\n\n比如：5 和 (2,3)，3.14 和 (5,4,3)\n",
+          "order": 1
+        }
+      ]
+    },
     {
       "id": "model_architecture",
       "title": "model_architecture",
       "color": "#3498db",
       "items": [
         {
-          "id": "MHA & MQA & GQA",
+          "id": "001.MHA & MQA & GQA",
           "title": "MHA & MQA & GQA",
           "difficulty": "Easy",
-          "tags": [],
+          "tags": [
+            "attention"
+          ],
           "content": "\n\n$MHA$、$MQA$、$GQA$ 都属于 $Transformer$ 里的注意力机制变体，本质是在讨论：$Query（Q）$有多少组，$Key/Value（K/V）$有多少组，是否共享。\n\n## MHA（Multi-Head Attention，多头注意力）\n它的思想是并行对多个 $head$ 做注意力计算\n\n每个 $head$ 都有自己独立的投影矩阵：\n$$Q_i = XW_i^Q,\\quad K_i = XW_i^K,\\quad V_i = XW_i^V$$\n\n第 $i$ 个 $head$ 的输出为:\n$$head_i = Attention(Q_i, K_i, V_i)$$\n\n最后把所有 $head$ 拼接起来：\n$$ MHA(X) = Concat(head_1, \\dots, head_h)W^O$$\n\n每个 $head$ 像一个“观察角度”，有的 $head$ 关注语法，有的 $head$ 关注长距离依赖，有的 $head$ 关注实体关系等，这样不同 $head$ 可以学习不同模式。相较于 $MQA$ 和 $GQA$ 表达能力最强，效果通常最好或最稳。\n\n但是缺点是由于每个 $head$ 都有独立 $K/V$，所以推理时要存很多 $KV \\space cache$，当大模型长上下文生成时，显存和带宽开销很大。\n\n## MQA（Multi-Query Attention，多查询注意力）\n相较于 $MHA$，$MQA$ 的核心变化是：每个 $head$ 仍然有自己的 $Q$，但所有 $head$ 共享同一组 $K$ 和 $V$\n\n也就是：\n\n$$Q_i = XW_i^Q$$\n\n但\n\n$$K = XW^K,\\quad V = XW^V$$\n\n然后每个 $head$ 都用自己的 $Q_i$ 去跟同一组 $K/V$ 做注意力：\n$$head_i = Attention(Q_i, K, V)$$\n\n简单来说就是所有 $head$ 共用一套 $K/V$，这样做的优点就是$KV \\space cache$显著减少，推理更快、更省显存。但是也正是因为所有 $head$ 共用一套 $K/V$，会导致不同 $head$ 的信息视角被压缩，表达能力可能会下降\n\n简单来说就是“所有$Q_i$共用同一套$K / V$”\n\n## GQA（Grouped-Query Attention，分组查询注意力）\n$GQA$ 其实就是 $MHA$ 和 $MQA$ 之间的折中。它的做法就是把很多 $query\\space heads$ 分成若干组，每一组共用一套 $K/V$，但是不同组之间有不同的 $K/V$\n\n比方说有 $h$ 个 $query \\space heads$，$g$ 组 $KV \\space heads$，那么通常是：\n- $h > g$\n- 每 $h//g$ 个 $query \\space head$ 共享一组 $K/V$\n\n例如：\n- 16 个 $query \\space heads$\n- 4 个 $KV \\space heads$\n- 那么每 4 个 $query \\space head$ 共享一组 $K/V$\n\n因为不是全共享，所以 $GQA$ 比 $MQA$ 保留了更多的表达能力；又由于在同一组内 $K/V$ 是共享的，所以 $GQA$ 又比 $MHA$ 更省 $KV \\space cache$。但是 $GQA$ 不像 $MHA$ 那么自由，实现和参数设计又比 $MQA$ 更复杂。\n\n简单来说就是“同一组内$Q_i$共用一套$K/V$”\n\n## 总结\n在 $Transformer$ 中，$MHA$ 是每个 $head$ 独立做注意力，$Q/K/V$ 全部分头，所以表达能力最强，但推理时 $KV \\space cache$ 很大。$MQA$ 让所有 $query \\space heads$ 共享同一组 $K/V$，大幅降低缓存和访存开销，推理更快，但可能损失效果。$GQA$ 则把 $query \\space heads$ 分组，每组共享一套 $K/V$，在模型效果和推理效率之间取得平衡，因此在大模型中很常见。三者主要区别在于 $K/V$ 是否共享，以及共享到什么程度:\n| 机制 | $Q$ 的方式 | $K/V$ 的方式 |\n|---|---|---|\n| $MHA$ | 每个 $head$ 独立 | 每个 $head$ 独立 |\n| $MQA$ | 每个 $head$ 独立 | 所有 $head$ 共享 |\n| $GQA$ | 每个 $head$ 独立 | 每组共享 |\n\n表达能力：$MHA$ > $GQA$ > $MQA$\n\n推理效率和显存友好度：$MQA$ > $GQA$ > $MHA$\n\n\n\n## Q&A\n1. 为什么 $MHA$、$MQA$、$GQA$ 主要影响推理，不太强调训练?\n\n    因为它们的核心区别在于 $K/V$ 的头数和共享方式，而这部分在自回归推理阶段最容易成为瓶颈。训练时通常是整段序列并行计算，主要压力来自矩阵乘法、反向传播和整体吞吐；但推理时需要把历史 $token$ 的 $K/V$ 保存到 $KV \\space cache$ 中，并在每一步生成新 $token$ 时反复读取。这样一来，$KV \\space heads$ 越多，显存占用和内存带宽压力就越大。$MQA$ 和 $GQA$ 通过减少或共享 $K/V$，显著降低了 $KV \\space cache$ 的大小和访存开销，所以它们的优势主要体现在推理效率和显存优化上，而不是训练阶段。\n\n2. 为什么 $GQA$/$MQA$ 能提升推理速度？\n   \n   因为自回归推理时，模型需要把历史 $token$ 的 $K/V$ 保存在 $KV \\space cache$ 中，并在生成每个新 $token$ 时反复读取。$K/V$ 头数越多，缓存越大，显存占用和内存带宽压力也越高。$GQA$/$MQA$ 通过减少 $KV \\space heads$ 的数量，显著降低了 $KV \\space cache$ 大小和访存开销，因此解码阶段会更快。\n\n\n\n3. 为什么 $MQA/GQA$ 能显著节省 $KV \\space cache$？\n   \n   因为 $KV \\space cache$ 的大小主要取决于 $KV \\space heads$ 的数量，而不是 $query \\space heads$ 的数量。假设序列长度是 $L$，每个 $head$ 维度是 $d_head$，$KV \\space heads$ 数是 $g$，那么 $KV cache$ 大小大致正比于 $L × g × d_{head}$。在 $MHA$ 里，$g = h$，也就是每个 $query \\space head$ 都有独立的 $K/V$，所以缓存最大；在 $MQA$ 里，$g = 1$，所有 $query heads$ 共享一组 $K/V$，所以缓存最小；在 $GQA$ 里，$g$ 介于 $1$ 和 $h$ 之间，属于折中方案。因此，$MQA$ 和 $GQA$ 通过减少 $KV \\space heads$，显著降低了显存占用和推理时的访存压力。\n\n4. 为什么 $GQA$ 往往比 $MQA$ 更受欢迎？\n\n    因为 $MQA$ 虽然能最大幅度压缩 $KV \\space cache$、提升推理效率，但它让所有 $query \\space heads$ 完全共享同一组 $K/V$，共享程度太高，可能削弱不同 $attention \\space heads$ 的表达能力，从而带来模型质量下降，尤其在复杂依赖建模和细粒度对齐任务上更明显。$GQA$ 采用的是部分共享策略，让多个 $query \\space heads$ 按组共享 $K/V$，既能显著减少缓存和访存开销，又比 $MQA$ 保留更多表示能力。所以在实际工程中，如果目标是极致推理效率，可以选择 $MQA$；如果更看重效果和效率的平衡，通常会更倾向于 $GQA$ 。\n\n5. $MHA$、$MQA$、$GQA$ 在参数量和计算量上怎么理解？\n\n    这个问题要分成两部分看。第一是参数量，$MHA$ 虽然可以理解为每个 $head$ 有独立的 $W^Q/W^K/W^V$，但工程实现里通常是用几个大投影矩阵一次性完成，所以 $MQA/GQA$ 的核心收益并不只是参数量减少。第二是推理开销，$MQA/GQA$ 更重要的优势在于减少了 $K/V$ 的投影头数，从而让 $KV \\space cache$ 更小、访存压力更低。虽然注意力分数本身还是要计算，但由于缓存读取和数据搬运变少，自回归解码阶段会更快。因此，这几种结构的差异更主要体现在推理部署效率上，而不是训练 $FLOPs$ 出现数量级变化。\n\n6. 为什么不是所有模型都直接用 $MQA$？\n\n    因为 $MQA$ 让所有 $query \\space heads$ 完全共享同一组 $K/V$，虽然这样最省显存、推理最快，但共享程度过高可能限制不同 $attention \\space heads$ 的表达能力，从而影响模型效果，尤其在复杂依赖建模和细粒度对齐任务上更明显。所以很多模型不会直接采用 $MQA$，而是使用 $GQA$ 作为效果和效率之间的折中。\n\n7. $GQA$ 里的 $group$ 是什么意思？\n\n    $group$ 指的是把多个 $query \\space heads$ 划分成若干组，每组共享一套 $K/V$。也就是说，$GQA$ 不是让所有 $query \\space heads$ 共用同一组 $K/V$，而是组内共享、组间分开。通常每一组对应一个 $KV \\space head$，这样既减少了 $KV \\space cache$，又比 $MQA$ 保留了更多表达能力。",
           "order": 1
+        },
+        {
+          "id": "002.RMSNorm",
+          "title": "RMSNorm",
+          "difficulty": "Easy",
+          "tags": [
+            "normalization"
+          ],
+          "content": "## $RMSNorm$\n\n$RMSNorm$ 就是对每个向量单独按它自己的整体大小做归一化，再乘上一个可学习的缩放参数 $weight$。它不看同一个 $batch$ 里的其他向量，也不看别的 $token$。\n\n在 $Transformer$ 里，如果张量形状是 $batch, seq_len, dim$，那么通常：$x[b,t,:]$这一整个长度为 $dim$ 的向量，就表示第 $b$ 个样本里、第 $t$ 个 $token$ 的隐藏表示。所以 $RMSNorm$ 就是“对每个 $token$ 的隐藏向量单独做归一化。”\n\n一个向量对应一个 $token$ 是 $NLP \\space Transformer$ 里最常见的情况；如果是图像、语音或别的模态，也可能对应的是一个 $patch$、$frame$ 或别的序列位置。\n\n\n设一个向量是：\n\n$$x = [x_1, x_2, \\dots, x_d]$$\n\n$RMS$ 就是 $Root Mean Square$，即均方根。 $RMSNorm$ 的计算就是先计算 $RMS$：\n\n$$RMS(x) = \\sqrt{\\frac{1}{d}\\sum_{i=1}^d x_i^2 + \\epsilon}$$\n\n然后做归一化：\n\n$$RMSNorm(x) = weight \\odot \\frac{x}{RMS(x)}$$\n\n其中：\n- $d$ 是最后一维的长度\n- $\\epsilon$ 是防止除零的小常数\n- $weight$ 是可学习参数，形状通常是 $$[dim]$$\n\n\n## $RMSNorm$ 和 $LayerNorm$ 的区别\n\n$LayerNorm$ 会做两件事：\n\n1. 减去均值\n2. 除以标准差\n\n公式是：\n\n$$LayerNorm(x) = \\gamma \\odot \\frac{x - \\mu}{\\sqrt{\\sigma^2 + \\epsilon}} + \\beta$$\n\n而 $RMSNorm$ 更简单，它不减均值，而且只按均方根缩放\n\n所以可以理解为 $LayerNorm$ 既管“偏移”，也管“尺度”；而 $RMSNorm$ 只管“尺度”\n\n## $RMSNorm$ 实现代码\n\n```python\nimport torch\nimport torch.nn as nn\n\nclass RMSNorm(nn.Module):\n    def __init__(self, dim, eps=1e-5):\n        super().__init__()\n        self.eps = eps\n        self.weight = nn.Parameter(torch.ones(dim))\n\n    def _norm(self, x):\n        rms_inv = torch.rsqrt(x.pow(2).mean(dim=-1, keepdim=True) + self.eps)\n        return x * rms_inv\n\n    def forward(self, x):\n        x_norm = self._norm(x.float()).type_as(x)\n        return x_norm * self.weight\n\nx = torch.randn(2, 4, 8)  # [batch, seq, hidden]\nnorm = RMSNorm(8)\ny = norm(x)\n\nprint(x.shape)  # torch.Size([2, 4, 8])\nprint(y.shape)  # torch.Size([2, 4, 8])\n```\n\n## 一个具体例子\n\n假设输入是：\n\n$$x \\in R^{[2,3,4]}$$\n\n即 $batch = 2$, $seq\\_len = 3$, $dim = 4$\n\n这种情况下一共有 $$2 \\times 3 = 6$$ 个向量，每个向量长度是 $$4$$。\n\n现在只看其中一个向量：\n\n$$x[0,0,:] = [1,2,3,4]$$\n\n该向量的计算过程如下：\n1. 平方\n\n$$[1,2,3,4]^2 = [1,4,9,16]$$\n\n2. 求平均\n\n$$mean([1,4,9,16]) = \\frac{1+4+9+16}{4} = 7.5$$\n\n3. 开根号，得到 $RMS$\n\n$$RMS(x[0,0,:]) = \\sqrt{7.5} \\approx 2.7386$$\n\n4. 原向量除以这个 $RMS$\n\n$$\\frac{[1,2,3,4]}{2.7386} \\approx [0.365, 0.730, 1.095, 1.461]$$\n\n如果此时：\n\n$$weight = [1,1,1,1]$$\n\n那么输出就是：\n\n$$[0.365, 0.730, 1.095, 1.461]$$\n\n\n\n## 和 $attention$ 的形状关系\n\n在多头注意力里，通常流程是：\n\n$$\n[batch, seq\\_len, dim]\n\\rightarrow\n[batch, seq\\_len, num\\_heads, head\\_dim]\n\\rightarrow\n[batch, num\\_heads, seq\\_len, head\\_dim]\n$$\n\n每个 $head$ 分别做 $attention$ 之后，结果通常会再拼回去：\n\n$$\n[batch, num\\_heads, seq\\_len, head\\_dim]\n\\rightarrow\n[batch, seq\\_len, num\\_heads, head\\_dim]\n\\rightarrow\n[batch, seq\\_len, dim]\n$$\n\n其中：\n\n$$dim = num\\_heads \\times head\\_dim$$\n\n之后再进入后续模块，比如 $RMSNorm$、残差连接、$MLP$ 等。\n\n\n## 总结\n\n$RMSNorm$ 就是对每个向量求该向量自己的 $RMS$， 再用这个 $RMS$ 去缩放自己\n",
+          "order": 2
         }
       ]
     }
